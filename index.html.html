@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bybit USDT Perp — калькулятор + поиск внутри инструмента</title>
+  <style>
+    :root{--bg:#0b1220;--card:#111b2e;--t:#e7eefc;--m:#9fb0d0;--bad:#ff5a6a;--good:#46d27d}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--t)}
+    .wrap{max-width:980px;margin:22px auto;padding:0 14px}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+    h1{font-size:18px;margin:0 0 12px}
+    label{display:block;font-size:12px;color:var(--m);margin:10px 0 6px}
+    input,select,button{
+      width:100%;padding:10px 12px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);background:#0b1426;color:var(--t);
+      box-sizing:border-box;
+    }
+    button{background:#1a2a4d;cursor:pointer;font-weight:600}
+    button:hover{filter:brightness(1.08)}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:12px;align-items:start}
+    @media (max-width:920px){.grid{grid-template-columns:1fr}}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:520px){.row{grid-template-columns:1fr}}
+    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    @media (max-width:520px){.kpi{grid-template-columns:1fr}}
+    .box{border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;background:rgba(0,0,0,.12)}
+    .box .t{font-size:12px;color:var(--m);margin-bottom:6px}
+    .box .v{font-size:18px;font-variant-numeric:tabular-nums}
+    .good{color:var(--good)} .bad{color:var(--bad)}
+    .small{font-size:12px;color:var(--m);margin-top:10px;line-height:1.35}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:12px 0}
+    .muted{color:var(--m)}
+
+    /* combobox */
+    .combo{position:relative}
+    .dropdown{
+      position:absolute;left:0;right:0;top:calc(100% + 6px);
+      background:#0b1426;border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;max-height:280px;overflow:auto;z-index:50;
+      display:none;
+    }
+    .dropdown.open{display:block}
+    .item{
+      padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06);
+      cursor:pointer;font-variant-numeric:tabular-nums;
+    }
+    .item:last-child{border-bottom:none}
+    .item:hover{background:rgba(255,255,255,.06)}
+    .item .s{display:flex;justify-content:space-between;gap:10px}
+    .item .sym{font-weight:600}
+    .item .px{color:var(--m)}
+    .hintline{display:flex;justify-content:space-between;gap:10px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Bybit USDT (Linear Perp) — калькулятор + поиск в поле инструмента (.P как в TradingView)</h1>
+
+    <div class="grid">
+      <div>
+        <div class="row">
+          <div>
+            <label>Направление</label>
+            <select id="side">
+              <option value="long">LONG</option>
+              <option value="short">SHORT</option>
+            </select>
+          </div>
+          <div>
+            <label>Плечо (x)</label>
+            <input id="lev" type="number" min="1" step="0.1" value="20">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="combo">
+            <label>Инструмент (начни печатать: ZORA / BTC / USDT…)</label>
+            <input id="instrumentInput" type="text" placeholder="Например: ZORA" autocomplete="off">
+            <div class="dropdown" id="instrumentDropdown"></div>
+            <div class="small muted hintline">
+              <span id="apiHint">—</span>
+              <span id="foundHint"></span>
+            </div>
+          </div>
+
+          <div>
+            <label>Цена входа (авто из Bybit, можно исправить)</label>
+            <input id="entry" type="number" min="0" step="0.01" value="65000">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Количество инструмента (qty, в монетах)</label>
+            <input id="qty" type="number" min="0" step="0.000001" value="0.01">
+          </div>
+          <div>
+            <label>Баланс (USDT) — необязательно (для %)</label>
+            <input id="balance" type="number" min="0" step="0.01" value="1000">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Stop‑Loss цена</label>
+            <input id="sl" type="number" min="0" step="0.01" value="64000">
+          </div>
+          <div>
+            <label>Take‑Profit цена</label>
+            <input id="tp" type="number" min="0" step="0.01" value="67000">
+          </div>
+        </div>
+
+        <div class="row">
+          <div><button id="calcBtn" type="button">Рассчитать</button></div>
+          <div><button id="refreshBtn" type="button">Обновить цену с Bybit</button></div>
+        </div>
+
+        <div class="row">
+          <div><button id="resetBtn" type="button">Сброс</button></div>
+          <div><input disabled value="Комиссии/ликвидация не учитываются"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="kpi">
+          <div class="box">
+            <div class="t">1) Маржа</div>
+            <div class="v" id="outMargin">—</div>
+            <div class="small" id="outMarginPct"></div>
+          </div>
+
+          <div class="box">
+            <div class="t">2) Цена входа</div>
+            <div class="v" id="outEntry">—</div>
+            <div class="small" id="outNotional">—</div>
+          </div>
+
+          <div class="box">
+            <div class="t">3) Stop‑Loss и убыток (USDT)</div>
+            <div class="v" id="outSL">—</div>
+            <div class="v bad" id="outLoss">—</div>
+          </div>
+
+          <div class="box">
+            <div class="t">4) Take‑Profit и прибыль (USDT)</div>
+            <div class="v" id="outTP">—</div>
+            <div class="v good" id="outProfit">—</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="small" id="warn">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const priceMap = new Map(); // "BTCUSDT" -> lastPrice
+  let allSymbols = [];        // Bybit symbols: ["BTCUSDT","ZORAUSDT",...]
+  let selectedBybitSymbol = ""; // without .P
+
+  const toBybit = (maybeTv) => String(maybeTv || "").toUpperCase()
+    .replace(/^BYBIT:/,"")
+    .replace(/\.P$/,"");
+
+  const toTV = (bybitSymbol) => String(bybitSymbol || "").toUpperCase() + ".P";
+
+  function clearOut(){
+    ["outMargin","outMarginPct","outEntry","outNotional","outSL","outLoss","outTP","outProfit","warn"]
+      .forEach(id => $(id).textContent = "—");
+  }
+
+  function fmt(n){
+    if(!isFinite(n)) return "—";
+    return n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function fmtP(n){
+    if(!isFinite(n)) return "";
+    return n.toFixed(2) + "% от баланса";
+  }
+
+  function calc(){
+    const side = $("side").value;
+    const lev = +$("lev").value;
+    const entry = +$("entry").value;
+    const qty = +$("qty").value;
+    const sl = +$("sl").value;
+    const tp = +$("tp").value;
+    const balance = +$("balance").value;
+
+    const warn = [];
+    if(!(lev > 0)) warn.push("Плечо должно быть > 0");
+    if(!(entry > 0)) warn.push("Цена входа должна быть > 0");
+    if(!(qty > 0)) warn.push("Количество (qty) должно быть > 0");
+    if(!selectedBybitSymbol) warn.push("Выбери инструмент из списка");
+
+    if(warn.length){
+      $("warn").innerHTML = "Ошибки:<br>• " + warn.join("<br>• ");
+      return;
+    }
+
+    const notional = entry * qty;
+    const margin = notional / lev;
+
+    const pnlAt = (exitPrice) => (side === "long")
+      ? (exitPrice - entry) * qty
+      : (entry - exitPrice) * qty;
+
+    const loss = Math.max(0, -pnlAt(sl));
+    const profit = Math.max(0, pnlAt(tp));
+
+    if(side === "long"){
+      if(sl >= entry) warn.push("Для LONG SL обычно ниже цены входа");
+      if(tp <= entry) warn.push("Для LONG TP обычно выше цены входа");
+    } else {
+      if(sl <= entry) warn.push("Для SHORT SL обычно выше цены входа");
+      if(tp >= entry) warn.push("Для SHORT TP обычно ниже цены входа");
+    }
+
+    $("outMargin").textContent = "$" + fmt(margin);
+    $("outEntry").textContent  = fmt(entry);
+    $("outNotional").textContent = "Номинал позиции: $" + fmt(notional);
+
+    $("outSL").textContent = "SL: " + fmt(sl);
+    $("outLoss").textContent = "Убыток: $" + fmt(loss);
+
+    $("outTP").textContent = "TP: " + fmt(tp);
+    $("outProfit").textContent = "Профит: $" + fmt(profit);
+
+    $("outMarginPct").textContent = (balance > 0) ? fmtP((margin / balance) * 100) : "";
+    $("warn").innerHTML = warn.length ? ("Проверки:<br>• " + warn.join("<br>• ")) : "Ок";
+  }
+
+  async function fetchTickers() {
+    const url = "https://api.bybit.com/v5/market/tickers?category=linear";
+    const res = await fetch(url);
+    const json = await res.json();
+    const list = json?.result?.list || [];
+    priceMap.clear();
+    for (const t of list) {
+      const p = Number(t.lastPrice);
+      if (t.symbol && isFinite(p)) priceMap.set(String(t.symbol).toUpperCase(), p);
+    }
+  }
+
+  async function fetchAllLinearSymbols() {
+    const out = [];
+    let cursor = "";
+    for (let i=0; i<40; i++) {
+      const url = new URL("https://api.bybit.com/v5/market/instruments-info");
+      url.searchParams.set("category", "linear");
+      if (cursor) url.searchParams.set("cursor", cursor);
+
+      const res = await fetch(url);
+      const json = await res.json();
+      const list = json?.result?.list || [];
+      for (const x of list) {
+        const sym = (x.symbol || "").toUpperCase();
+        if (sym.endsWith("USDT")) out.push(sym);
+      }
+      cursor = json?.result?.nextPageCursor || "";
+      if (!cursor) break;
+    }
+    return [...new Set(out)].sort((a,b)=>a.localeCompare(b));
+  }
+
+  function openDropdown(open){
+    $("instrumentDropdown").classList.toggle("open", !!open);
+  }
+
+  function setSelectedSymbol(bybitSym){
+    selectedBybitSymbol = bybitSym;
+    const tv = toTV(bybitSym);
+    $("instrumentInput").value = tv; // показываем как TradingView
+    const p = priceMap.get(bybitSym);
+    if (isFinite(p) && p > 0) $("entry").value = p;
+    openDropdown(false);
+    $("warn").textContent = "Цена подставлена. Нажми «Рассчитать».";
+  }
+
+  function renderDropdown(list){
+    const dd = $("instrumentDropdown");
+    dd.innerHTML = "";
+    const max = 200; // чтобы не рисовать тысячи строк при пустом вводе
+    const shown = list.slice(0, max);
+
+    for (const bybitSym of shown) {
+      const tv = toTV(bybitSym);
+      const p = priceMap.get(bybitSym);
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="s">
+          <span class="sym">${tv}</span>
+          <span class="px">${isFinite(p) ? p : ""}</span>
+        </div>
+      `;
+      div.addEventListener("mousedown", (e) => { // mousedown чтобы не потерять фокус раньше клика
+        e.preventDefault();
+        setSelectedSymbol(bybitSym);
+      });
+      dd.appendChild(div);
+    }
+
+    $("foundHint").textContent = list.length
+      ? `Найдено: ${list.length}${list.length>max ? ` (показано ${max})` : ""}`
+      : "Ничего не найдено";
+  }
+
+  function filterByInput(){
+    const raw = $("instrumentInput").value || "";
+    const q = toBybit(raw); // убирает BYBIT: и .P, верхний регистр
+
+    // если ничего не введено — покажем популярные/первые N, иначе — все совпадения по подстроке
+    let filtered;
+    if (!q) {
+      filtered = allSymbols;
+    } else {
+      filtered = allSymbols.filter(s => s.includes(q));
+    }
+
+    renderDropdown(filtered);
+    openDropdown(true);
+
+    // если пользователь вручную печатает — считаем, что выбор “снят”, пока не кликнет по элементу
+    // (иначе можно случайно рассчитать с прошлым инструментом)
+    selectedBybitSymbol = "";
+  }
+
+  async function initBybit(){
+    try{
+      $("apiHint").textContent = "Загружаем инструменты и цены с api.bybit.com…";
+      await fetchTickers();
+      allSymbols = await fetchAllLinearSymbols();
+      $("apiHint").textContent = `Инструментов: ${allSymbols.length}. Пиши 1 символ — сразу фильтруем.`;
+
+      // default BTC
+      if (allSymbols.includes("BTCUSDT")) {
+        setSelectedSymbol("BTCUSDT");
+      }
+    } catch(e){
+      console.error(e);
+      $("apiHint").textContent =
+        "Не удалось загрузить Bybit API. Открой через http://localhost (локальный сервер) и проверь интернет/CORS.";
+    }
+  }
+
+  // events
+  $("calcBtn").addEventListener("click", calc);
+
+  $("refreshBtn").addEventListener("click", async () => {
+    if(!selectedBybitSymbol){
+      $("warn").textContent = "Сначала выбери инструмент из списка (кликни по нему).";
+      return;
+    }
+    try{
+      await fetchTickers();
+      const p = priceMap.get(selectedBybitSymbol);
+      if (isFinite(p) && p > 0) $("entry").value = p;
+      $("warn").textContent = "Цена обновлена. Нажми «Рассчитать».";
+    } catch(e){
+      console.error(e);
+      $("warn").textContent = "Ошибка обновления цены (см. консоль).";
+    }
+  });
+
+  $("resetBtn").addEventListener("click", () => {
+    $("side").value = "long";
+    $("lev").value = 20;
+    $("qty").value = 0.01;
+    $("sl").value = 64000;
+    $("tp").value = 67000;
+    $("balance").value = 1000;
+    clearOut();
+    if (allSymbols.includes("BTCUSDT")) setSelectedSymbol("BTCUSDT");
+  });
+
+  $("instrumentInput").addEventListener("focus", () => {
+    filterByInput();
+  });
+  $("instrumentInput").addEventListener("input", () => {
+    filterByInput();
+  });
+
+  // закрытие списка по клику вне
+  document.addEventListener("mousedown", (e) => {
+    const combo = $("instrumentInput").closest(".combo");
+    if (!combo.contains(e.target)) openDropdown(false);
+  });
+
+  clearOut();
+  initBybit();
+</script>
+</body>
+</html>
