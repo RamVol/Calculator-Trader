@@ -8,132 +8,126 @@
     :root {
       --bg: #050816;
       --card: #0b1220;
-      --border: rgba(255,255,255,0.08);
-      --border-soft: rgba(255,255,255,0.05);
+      --border: rgba(255, 255, 255, 0.08);
+      --bordersoft: rgba(255, 255, 255, 0.05);
       --t: #f9fafb;
-      --t-soft: #9ca3af;
+      --tsoft: #9ca3af;
       --good: #22c55e;
       --bad: #ef4444;
-      --input-bg: #020617;
+      --inputbg: #020617;
     }
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
-      margin:0;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-      background:radial-gradient(circle at top,#111827 0,#020617 55%);
-      color:var(--t);
+      margin: 0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background: radial-gradient(circle at top, #111827, #020617 55%);
+      color: var(--t);
     }
-    .wrap{max-width:1080px;margin:20px auto;padding:0 14px 24px;}
-    .card{
-      background:var(--card);
-      border-radius:14px;
-      border:1px solid var(--border);
-      padding:14px;
-      box-shadow:0 18px 45px rgba(0,0,0,0.55);
+    .wrap { max-width: 1180px; margin: 20px auto; padding: 0 14px 24px; }
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 18px 18px 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.55);
     }
-    h1{margin:0 0 12px;font-size:18px;font-weight:600;}
-    .subtitle{margin-bottom:10px;font-size:12px;color:var(--t-soft);}
-    label{
+    h1 { margin: 0 0 8px; font-size: 18px; font-weight: 600; }
+    .subtitle { margin-bottom: 14px; font-size: 12px; color: var(--tsoft); }
+    label {
       display:block;
-      margin:8px 0 4px;
-      font-size:12px;
-      color:var(--t-soft);
+      margin: 6px 0 4px;
+      font-size: 12px;
+      color: var(--tsoft);
     }
-    input,select,button{
+    input, select, button {
       width:100%;
       padding:9px 11px;
-      border-radius:10px;
+      border-radius:12px;
       border:1px solid var(--border);
-      background:var(--input-bg);
+      background:var(--inputbg);
       color:var(--t);
       font-size:13px;
       font-family:inherit;
+      outline:none;
     }
-    input::placeholder{color:#6b7280;}
-    input[disabled]{opacity:.7;cursor:not-allowed;}
-    button{
+    input::placeholder { color:#6b7280; }
+    button {
       background:#111827;
       font-weight:600;
       cursor:pointer;
-      transition:background .15s,transform .05s;
+      transition:background .15s, transform .05s, filter .15s;
     }
-    button:hover{background:#1f2937;}
-    button:active{transform:translateY(1px);}
-    .btn-primary{
+    button:hover { background:#1f2937; }
+    button:active { transform:translateY(1px); }
+    .btn-primary {
       background:linear-gradient(135deg,#2563eb,#4f46e5);
-      border-color:rgba(59,130,246,0.6);
+      border-color:rgba(59,130,246,.7);
     }
-    .btn-primary:hover{filter:brightness(1.05);}
-    .grid{
+    .btn-primary:hover { filter:brightness(1.05); }
+    .grid {
       display:grid;
-      grid-template-columns:1.08fr 0.92fr;
-      gap:12px;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:14px;
       align-items:flex-start;
     }
-    @media(max-width:980px){.grid{grid-template-columns:1fr;}}
-    .row{
+    @media (max-width:980px){ .grid{ grid-template-columns:1fr; } }
+    .row {
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
       margin-bottom:6px;
     }
-    @media(max-width:520px){.row{grid-template-columns:1fr;}}
-    .combo{position:relative;}
-    .dropdown{
-      position:absolute;
-      left:0;right:0;top:calc(100% + 4px);
-      background:#020617;
-      border-radius:10px;
-      border:1px solid var(--border);
-      max-height:260px;
-      overflow:auto;
-      z-index:20;
-      display:none;
-    }
-    .dropdown.open{display:block;}
-    .item{
-      padding:8px 10px;
-      border-bottom:1px solid var(--border-soft);
-      font-size:13px;
-      cursor:pointer;
-    }
-    .item:last-child{border-bottom:none;}
-    .item:hover{background:#020617;filter:brightness(1.12);}
-    .item-line{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      align-items:center;
-    }
-    .item-sym{font-weight:600;}
-    .item-base{color:var(--t-soft);}
-    .small{font-size:11px;color:var(--t-soft);margin-top:4px;}
-    .small-row{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      font-size:11px;
-      color:var(--t-soft);
-      margin-top:4px;
-    }
-    .kpi{
+    @media (max-width:600px){ .row{ grid-template-columns:1fr; } }
+
+    .kpi {
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:8px;
+      gap:10px;
     }
-    @media(max-width:520px){.kpi{grid-template-columns:1fr;}}
-    .box{
-      border-radius:12px;
+    @media (max-width:600px){ .kpi{ grid-template-columns:1fr; } }
+    .box {
+      border-radius:14px;
       border:1px solid var(--border);
-      background:radial-gradient(circle at top left,#111827 0,#020617 55%);
-      padding:10px;
+      background:radial-gradient(circle at top left,#111827,#020617 55%);
+      padding:10px 12px;
     }
-    .box .t{font-size:11px;color:var(--t-soft);margin-bottom:4px;}
-    .box .v{font-size:18px;font-variant-numeric:tabular-nums;line-height:1.2;}
-    .good{color:var(--good);}
-    .bad{color:var(--bad);}
-    .hr{height:1px;background:var(--border-soft);margin:10px 0;}
-    #warndiv{font-size:11px;color:var(--t-soft);line-height:1.4;min-height:1em;}
+    .box .t { font-size:11px; color:var(--tsoft); margin-bottom:4px; }
+    .box .v {
+      font-size:18px;
+      font-variant-numeric:tabular-nums;
+      line-height:1.2;
+    }
+    .small-row {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:4px;
+      font-size:11px;
+      color:var(--tsoft);
+    }
+    .good { color:var(--good); }
+    .bad { color:var(--bad); }
+    hr {
+      height:1px;
+      background:var(--bordersoft);
+      border:none;
+      margin:10px 0;
+    }
+    .warn {
+      margin-top:6px;
+      font-size:11px;
+      color:var(--tsoft);
+      min-height:1.2em;
+    }
+    .half-btns {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+    @media (max-width:600px) {.half-btns{ grid-template-columns:1fr; } }
+
+    .muted { font-size:11px; color:var(--tsoft); margin-top:4px; }
   </style>
 </head>
 <body>
@@ -142,329 +136,353 @@
     <h1>Bybit USDT (Linear Perp) — калькулятор по марже (.P)</h1>
     <div class="subtitle">
       Вводишь маржу в USDT — калькулятор показывает, сколько монет можно открыть с учётом плеча,
-      PnL по SL/TP и стоимость пункта. ZORAUSDT.P доступна в списке.
+      PnL по SL/TP и стоимость пункта. Все USDT линейные перпы подтягиваются с Bybit V5 (с пагинацией).
     </div>
 
     <div class="grid">
-      <!-- Левая панель -->
+      <!-- Левая колонка: ввод -->
       <div>
         <div class="row">
           <div>
-            <label for="side">Направление</label>
-            <select id="side">
+            <label for="direction">Направление</label>
+            <select id="direction">
               <option value="long">LONG</option>
               <option value="short">SHORT</option>
             </select>
           </div>
           <div>
-            <label for="lev">Плечо (x)</label>
-            <input id="lev" type="number" min="1" step="0.1" value="20">
+            <label for="leverage">Плечо (x)</label>
+            <input id="leverage" type="text" placeholder="Например, 20" value="20">
           </div>
         </div>
 
         <div class="row">
-          <div class="combo">
-            <label for="instrumentInput">Инструмент (.P как в TV)</label>
-            <input id="instrumentInput" type="text" autocomplete="off"
-                   placeholder="Например ZORAUSDT.P / BTCUSDT.P">
-            <div id="instrumentDropdown" class="dropdown"></div>
-            <div class="small-row">
-              <span id="apiHint"></span>
-              <span id="foundHint"></span>
+          <div>
+            <label for="symbolInput">Инструмент (USDT линейный перп)</label>
+            <input id="symbolInput" list="symbolsList" placeholder="Начни вводить: Z или ZORA…">
+            <datalist id="symbolsList"></datalist>
+            <div class="muted" id="symbolsInfo">
+              Загружаю все страницы instruments-info V5 (category=linear, quoteCoin=USDT)…
             </div>
           </div>
           <div>
             <label for="entry">Цена входа</label>
-            <input id="entry" type="number" min="0" step="0.000001" value="">
+            <input id="entry" type="text" placeholder="Авто-подтяжка, можно изменить вручную">
           </div>
         </div>
 
-        <!-- Маржа + количество монет на эту маржу -->
         <div class="row">
           <div>
-            <label for="marginInput">Маржа (USDT, сколько готов поставить)</label>
-            <input id="marginInput" type="number" min="0" step="0.01" value="25">
+            <label for="margin">Маржа (USDT, сколько готов поставить)</label>
+            <input id="margin" type="text" placeholder="Например, 25">
           </div>
           <div>
-            <label>Сколько монет на эту маржу</label>
-            <input id="qtyDisplay" type="text" disabled value="—">
+            <label for="qty">Сколько монет на эту маржу</label>
+            <input id="qty" type="text" placeholder="Авторасчёт, можно поправить">
           </div>
         </div>
 
         <div class="row">
           <div>
             <label for="sl">Stop-Loss цена</label>
-            <input id="sl" type="number" min="0" step="0.000001" value="">
+            <input id="sl" type="text" placeholder="Например, 2.10">
           </div>
           <div>
             <label for="tp">Take-Profit цена</label>
-            <input id="tp" type="number" min="0" step="0.000001" value="">
+            <input id="tp" type="text" placeholder="Например, 2.80">
           </div>
         </div>
 
-        <div class="row">
-          <div>
-            <button id="calcBtn" type="button" class="btn-primary">Рассчитать</button>
-          </div>
-          <div>
-            <button id="refreshBtn" type="button">Обновить цену с Bybit</button>
-          </div>
+        <div style="margin-top:8px;">
+          <button id="btnCalc" class="btn-primary">Рассчитать</button>
         </div>
-
-        <div class="row">
-          <div>
-            <button id="resetBtn" type="button">Сброс</button>
-          </div>
+        <div class="half-btns">
+          <button id="btnUpdate">Обновить цену выбранного инструмента</button>
+          <button id="btnClear">Сброс</button>
         </div>
+        <div class="warn" id="warn"></div>
       </div>
 
-      <!-- Правая панель -->
+      <!-- Правая колонка: результаты -->
       <div>
         <div class="kpi">
           <div class="box">
-            <div class="t">1) Take-Profit и прибыль</div>
-            <div class="v" id="outTP">—</div>
-            <div class="v good" id="outProfit">—</div>
+            <div class="t">1) Take-Profit и прибыль (в USDT)</div>
+            <div class="v good" id="outTpPnl">—</div>
+            <div class="small-row">
+              <span>% к марже</span>
+              <span id="outTpPct">—</span>
+            </div>
           </div>
-
           <div class="box">
-            <div class="t">2) Stop-Loss и убыток</div>
-            <div class="v" id="outSL">—</div>
-            <div class="v bad" id="outLoss">—</div>
-          </div>
-
-          <div class="box">
-            <div class="t">3) Номинал позиции</div>
-            <div class="v" id="outNotionalMain">—</div>
-            <div class="small" id="outNotionalHint"></div>
-          </div>
-
-          <div class="box">
-            <div class="t">4) Стоимость 1 пункта (тик 0.0001)</div>
-            <div class="v" id="outTickValue">—</div>
-            <div class="small" id="outTickHint"></div>
+            <div class="t">2) Stop-Loss и убыток (в USDT)</div>
+            <div class="v bad" id="outSlPnl">—</div>
+            <div class="small-row">
+              <span>% к марже</span>
+              <span id="outSlPct">—</span>
+            </div>
           </div>
         </div>
 
-        <div class="hr"></div>
-        <div id="warndiv"></div>
+        <hr>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="t">3) Номинал позиции (в монетах)</div>
+            <div class="v" id="outNominal">—</div>
+            <div class="small-row">
+              <span>Объём (qty)</span>
+              <span id="outQty">—</span>
+            </div>
+          </div>
+          <div class="box">
+            <div class="t">4) Стоимость 1 пункта (в USDT)</div>
+            <div class="v" id="outTickValue">—</div>
+            <div class="small-row">
+              <span>Формула</span>
+              <span id="tickFormula">qty × tickSize (из биржи)</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
+
   </div>
 </div>
 
 <script>
-  const $ = id => document.getElementById(id);
+  const symbolsMeta = {};   // { symbol: { tickSize, baseCoin, quoteCoin } }
+  let allSymbols = [];      // массив объектов-инструментов
 
-  const sideEl     = $('side');
-  const levEl      = $('lev');
-  const instrInput = $('instrumentInput');
-  const dropdown   = $('instrumentDropdown');
-  const apiHint    = $('apiHint');
-  const foundHint  = $('foundHint');
-  const entryEl    = $('entry');
-  const marginEl   = $('marginInput');
-  const qtyDisplay = $('qtyDisplay');
-  const slEl       = $('sl');
-  const tpEl       = $('tp');
-
-  const outNotionalMain = $('outNotionalMain');
-  const outNotionalHint = $('outNotionalHint');
-  const outSL           = $('outSL');
-  const outLoss         = $('outLoss');
-  const outTP           = $('outTP');
-  const outProfit       = $('outProfit');
-  const outTickValue    = $('outTickValue');
-  const outTickHint     = $('outTickHint');
-  const warnDiv         = $('warndiv');
-
-  const calcBtn    = $('calcBtn');
-  const refreshBtn = $('refreshBtn');
-  const resetBtn   = $('resetBtn');
-
-  const symbols = [
-    { apiSymbol:'BTCUSDT',   tvSymbol:'BTCUSDT.P',   base:'BTC',   quote:'USDT' },
-    { apiSymbol:'ETHUSDT',   tvSymbol:'ETHUSDT.P',   base:'ETH',   quote:'USDT' },
-    { apiSymbol:'SOLUSDT',   tvSymbol:'SOLUSDT.P',   base:'SOL',   quote:'USDT' },
-    { apiSymbol:'ZORAUSDT',  tvSymbol:'ZORAUSDT.P',  base:'ZORA',  quote:'USDT' },
-    { apiSymbol:'ZKUSDT',    tvSymbol:'ZKUSDT.P',    base:'ZK',    quote:'USDT' },
-    { apiSymbol:'ZROUSDT',   tvSymbol:'ZROUSDT.P',   base:'ZRO',   quote:'USDT' },
-    { apiSymbol:'ZILUSDT',   tvSymbol:'ZILUSDT.P',   base:'ZIL',   quote:'USDT' },
-  ];
-  apiHint.textContent = `Инструментов: ${symbols.length}. Пиши 1 символ — фильтр.`;
-
-  function renderDropdown(list) {
-    dropdown.innerHTML = '';
-    if (!list.length) {
-      dropdown.classList.remove('open');
-      foundHint.textContent = 'Ничего не найдено';
-      return;
-    }
-    list.slice(0, 200).forEach(s => {
-      const el = document.createElement('div');
-      el.className = 'item';
-      el.innerHTML = `
-        <div class="item-line">
-          <span class="item-sym">${s.tvSymbol}</span>
-          <span class="item-base">${s.base}/${s.quote}</span>
-        </div>
-      `;
-      el.addEventListener('click', () => {
-        instrInput.value = s.tvSymbol;
-        dropdown.classList.remove('open');
-        foundHint.textContent = `${s.base}/${s.quote}`;
-        fetchLastPrice(s.apiSymbol);
-      });
-      dropdown.appendChild(el);
-    });
-    dropdown.classList.add('open');
-    foundHint.textContent = `Найдено: ${list.length}`;
+  function parseNum(v) {
+    if (typeof v !== 'string') return NaN;
+    v = v.replace(/\s+/g, '').replace(',', '.');
+    return v === '' ? NaN : Number(v);
+  }
+  function fmt(v, d = 2) {
+    if (!isFinite(v)) return '—';
+    return v.toFixed(d);
   }
 
-  instrInput.addEventListener('input', () => {
-    let q = instrInput.value.trim().toUpperCase();
-    if (!q) {
-      dropdown.classList.remove('open');
-      foundHint.textContent = '';
+  function renderSymbolsToDatalist() {
+    const dl = document.getElementById('symbolsList');
+    dl.innerHTML = '';
+    for (const inst of allSymbols) {
+      const symbol = inst.symbol;
+      const tickSize = inst.priceFilter?.tickSize || '0.0001';
+      const opt = document.createElement('option');
+      opt.value = symbol;
+      opt.label = `${symbol}.P  (tickSize ${tickSize})`;
+      dl.appendChild(opt);
+    }
+  }
+
+  function getSelectedSymbol() {
+    const val = document.getElementById('symbolInput').value.trim();
+    if (!val) return '';
+    const exists = allSymbols.some(inst => inst.symbol === val);
+    return exists ? val : '';
+  }
+
+  async function fetchAndSetPrice(auto = true) {
+    const symbol = getSelectedSymbol();
+    const warnEl = document.getElementById('warn');
+
+    if (!symbol) {
+      if (!auto) warnEl.textContent = 'Сначала выбери корректный тикер из поля инструмента.';
       return;
     }
-    q = q.replace(/\.P\b/i, '');
-    const parts = q.split(/\s+/).filter(Boolean);
 
-    const list = symbols.filter(s => {
-      const text = `${s.apiSymbol} ${s.tvSymbol} ${s.base}`.toUpperCase();
-      return parts.every(p => text.includes(p));
-    });
-    renderDropdown(list);
-  });
+    warnEl.textContent = 'Запрашиваю цену с Bybit…';
 
-  document.addEventListener('click', e => {
-    if (!dropdown.contains(e.target) && e.target !== instrInput) {
-      dropdown.classList.remove('open');
-    }
-  });
-
-  async function fetchLastPrice(symbol) {
-    if (!symbol) return;
     try {
-      apiHint.textContent = `Цена для ${symbol}...`;
-      const url =
-        'https://api.bybit.com/v5/market/tickers?category=linear&symbol=' +
-        encodeURIComponent(symbol);
+      const url = `https://api.bybit.com/v5/market/tickers?category=linear&symbol=${encodeURIComponent(symbol)}`;
       const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if (data.retCode !== 0 || !data.result?.list?.length) {
-        throw new Error(data.retMsg || 'no data');
+      if (data.retCode !== 0 || !data.result || !data.result.list || !data.result.list.length) {
+        throw new Error('Нет данных по инструменту');
       }
-      const px = Number(data.result.list[0].lastPrice);
-      if (!isFinite(px)) throw new Error('bad price');
-      entryEl.value = px;
-      apiHint.textContent = `Last price: ${px}`;
+      const lastPrice = parseFloat(data.result.list[0].lastPrice);
+      if (!isFinite(lastPrice) || lastPrice <= 0) throw new Error('Некорректная цена');
+
+      document.getElementById('entry').value = lastPrice.toString();
+      warnEl.textContent = auto ? '' : 'Цена обновлена.';
     } catch (e) {
       console.error(e);
-      apiHint.textContent = 'Ошибка API Bybit (ticker)';
+      warnEl.textContent = 'Не удалось получить цену с Bybit: ' + e.message;
     }
   }
 
-  refreshBtn.addEventListener('click', () => {
-    let sym = instrInput.value.trim().toUpperCase();
-    if (!sym) {
-      apiHint.textContent = 'Сначала выбери инструмент';
-      return;
-    }
-    sym = sym.replace(/\.P\b/i, '');
-    fetchLastPrice(sym);
-  });
-
   function calc() {
-    warnDiv.textContent = '';
+    const dir = document.getElementById('direction').value;
+    const margin = parseNum(document.getElementById('margin').value);
+    const lev = parseNum(document.getElementById('leverage').value);
+    const entry = parseNum(document.getElementById('entry').value);
+    const sl = parseNum(document.getElementById('sl').value);
+    const tp = parseNum(document.getElementById('tp').value);
+    const qtyManual = parseNum(document.getElementById('qty').value);
+    const symbol = getSelectedSymbol();
+    const warnEl = document.getElementById('warn');
+    warnEl.textContent = '';
 
-    const side  = sideEl.value;
-    const lev   = Number(levEl.value);
-    const entry = Number(entryEl.value);
-    const margin= Number(marginEl.value);
-    const sl    = Number(slEl.value);
-    const tp    = Number(tpEl.value);
-
-    if (!entry || !margin || !lev) {
-      warnDiv.textContent = 'Нужно минимум указать: цену входа, маржу и плечо.';
+    if (!symbol) {
+      warnEl.textContent = 'Выбери корректный тикер из списка (datalist).';
+      return;
+    }
+    if (!isFinite(margin) || margin <= 0) {
+      warnEl.textContent = 'Укажи маржу (>0).';
+      return;
+    }
+    if (!isFinite(lev) || lev <= 0) {
+      warnEl.textContent = 'Укажи плечо (>0).';
+      return;
+    }
+    if (!isFinite(entry) || entry <= 0) {
+      warnEl.textContent = 'Укажи цену входа (>0) или обнови с Bybit.';
       return;
     }
 
-    const notional = margin * lev;
-    const qtyRaw   = notional / entry;
-
-    const qty = Math.floor(qtyRaw);
-    qtyDisplay.value = qty + ' монет';
-
-    let pnlSL = NaN;
-    let pnlTP = NaN;
-
-    if (sl) {
-      pnlSL = side === 'long'
-        ? (sl - entry) * qty
-        : (entry - sl) * qty;
+    // === Автоматический расчёт количества монет ===
+    let qty;
+    if (isFinite(qtyManual) && qtyManual > 0) {
+      // если пользователь сам ввёл qty — используем его
+      qty = qtyManual;
+    } else {
+      // иначе считаем автоматически из маржи и плеча
+      const notionalUsdt = margin * lev; // сколько USDT в позиции
+      qty = notionalUsdt / entry;        // сколько монет по текущей цене
     }
-    if (tp) {
-      pnlTP = side === 'long'
+    if (!isFinite(qty) || qty <= 0) {
+      warnEl.textContent = 'Не удалось посчитать объём позиции.';
+      return;
+    }
+
+    // записываем авторассчитанное qty в левое поле
+    document.getElementById('qty').value = fmt(qty, 4);
+
+    // номинал в монетах (а не в USDT)
+    const nominal = qty;
+
+    let tpPnl = NaN, slPnl = NaN;
+    if (isFinite(tp) && tp > 0) {
+      tpPnl = (dir === 'long')
         ? (tp - entry) * qty
         : (entry - tp) * qty;
     }
+    if (isFinite(sl) && sl > 0) {
+      slPnl = (dir === 'long')
+        ? (sl - entry) * qty
+        : (entry - sl) * qty;
+    }
 
-    outNotionalMain.textContent = notional.toFixed(2) + ' USDT';
-    outNotionalHint.textContent =
-      `Номинал = маржа × плечо = ${margin.toFixed(2)} × ${lev.toFixed(2)} = ${notional.toFixed(2)} USDT.`;
+    const tpPct = isFinite(tpPnl) ? (tpPnl / margin) * 100 : NaN;
+    const slPct = isFinite(slPnl) ? (slPnl / margin) * 100 : NaN;
 
-    outTP.textContent    = tp ? tp.toFixed(6) : '—';
-    outProfit.textContent= isFinite(pnlTP) ? pnlTP.toFixed(2) + ' USDT' : '—';
+    let tickSize = 0.0001;
+    if (symbolsMeta[symbol] && symbolsMeta[symbol].tickSize) {
+      tickSize = parseFloat(symbolsMeta[symbol].tickSize);
+    }
+    const tickValue = qty * tickSize; // в USDT
 
-    outSL.textContent   = sl ? sl.toFixed(6) : '—';
-    outLoss.textContent = isFinite(pnlSL) ? pnlSL.toFixed(2) + ' USDT' : '—';
+    document.getElementById('outQty').textContent = fmt(qty, 4);
+    document.getElementById('outNominal').textContent = fmt(nominal, 4);
 
-    const TICK = 0.0001;
-    const tickValue = qty * TICK;
-    outTickValue.textContent = tickValue.toFixed(4) + ' USDT';
-    outTickHint.textContent  =
-      `При изменении цены на 0.0001 PnL изменится примерно на ${tickValue.toFixed(4)} USDT.`;
+    document.getElementById('outTickValue').textContent =
+      isFinite(tickValue) ? fmt(tickValue, 6) + ' USDT' : '—';
+    document.getElementById('tickFormula').textContent =
+      `qty × ${tickSize} (tickSize для ${symbol})`;
 
-    const riskPct   = margin ? (pnlSL / margin * 100) : NaN;
-    const rewardPct = margin ? (pnlTP / margin * 100) : NaN;
+    document.getElementById('outTpPnl').textContent =
+      isFinite(tpPnl) ? fmt(tpPnl, 2) + ' USDT' : '—';
+    document.getElementById('outTpPct').textContent =
+      isFinite(tpPct) ? fmt(tpPct, 2) + ' %' : '—';
 
-    let msg = [];
-    if (isFinite(riskPct))
-      msg.push(`Убыток по SL ≈ ${riskPct.toFixed(1)}% от маржи`);
-    if (isFinite(rewardPct))
-      msg.push(`Профит по TP ≈ ${rewardPct.toFixed(1)}% от маржи`);
-
-    warnDiv.textContent = msg.join(' · ');
+    document.getElementById('outSlPnl').textContent =
+      isFinite(slPnl) ? fmt(slPnl, 2) + ' USDT' : '—';
+    document.getElementById('outSlPct').textContent =
+      isFinite(slPct) ? fmt(slPct, 2) + ' %' : '—';
   }
 
-  calcBtn.addEventListener('click', calc);
+  function clearAll() {
+    ['margin','leverage','entry','sl','tp','qty','symbolInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (id === 'leverage') el.value = '20';
+      else el.value = '';
+    });
+    document.getElementById('warn').textContent = '';
+    ['outQty','outNominal','outTickValue','outTpPnl','outTpPct','outSlPnl','outSlPct']
+      .forEach(id => document.getElementById(id).textContent = '—');
+  }
 
-  resetBtn.addEventListener('click', () => {
-    sideEl.value   = 'long';
-    levEl.value    = 20;
-    instrInput.value = '';
-    entryEl.value  = '';
-    marginEl.value = 25;
-    slEl.value     = '';
-    tpEl.value     = '';
+  async function loadSymbols() {
+    const infoEl = document.getElementById('symbolsInfo');
+    infoEl.textContent = 'Загружаю список линейных контрактов с Bybit (много страниц)…';
 
-    dropdown.classList.remove('open');
-    foundHint.textContent = '';
-    apiHint.textContent   = `Инструментов: ${symbols.length}. Пиши 1 символ — фильтр.`;
+    try {
+      let cursor = '';
+      const all = [];
 
-    qtyDisplay.value      = '—';
-    outNotionalMain.textContent = '—';
-    outNotionalHint.textContent = '';
-    outSL.textContent           = '—';
-    outLoss.textContent         = '—';
-    outTP.textContent           = '—';
-    outProfit.textContent       = '—';
-    outTickValue.textContent    = '—';
-    outTickHint.textContent     = '';
-    warnDiv.textContent         = '';
+      for (let i = 0; i < 20; i++) {
+        const url = 'https://api.bybit.com/v5/market/instruments-info?category=linear'
+          + (cursor ? '&cursor=' + encodeURIComponent(cursor) : '');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.retCode !== 0 || !data.result || !data.result.list) {
+          throw new Error('API error: ' + (data.retMsg || 'unknown'));
+        }
+
+        all.push(...data.result.list);
+        cursor = data.result.nextPageCursor || '';
+        if (!cursor) break;
+      }
+
+      let list = all.filter(inst => inst.quoteCoin === 'USDT');
+      list.sort((a,b) => (a.symbol > b.symbol ? 1 : -1));
+
+      allSymbols = list;
+
+      for (const inst of list) {
+        const symbol = inst.symbol;
+        const tickSize = inst.priceFilter?.tickSize || '0.0001';
+        symbolsMeta[symbol] = {
+          tickSize: tickSize,
+          baseCoin: inst.baseCoin,
+          quoteCoin: inst.quoteCoin
+        };
+      }
+
+      if (list.length === 0) {
+        infoEl.textContent = 'Bybit вернул пустой список USDT линейных контрактов.';
+      } else {
+        renderSymbolsToDatalist();
+        infoEl.textContent =
+          `Загружено ${list.length} USDT линейных бессрочных фьючерсов. Начни вводить тикер в поле выше.`;
+      }
+    } catch (e) {
+      console.error(e);
+      infoEl.textContent = 'Не удалось получить список инструментов: ' + e.message;
+    }
+  }
+
+  document.getElementById('btnCalc').addEventListener('click', calc);
+  document.getElementById('btnClear').addEventListener('click', clearAll);
+  document.getElementById('btnUpdate').addEventListener('click', () => fetchAndSetPrice(false));
+
+  ['margin','leverage','entry','sl','tp','qty','symbolInput'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') calc();
+    });
   });
+
+  // При выборе/изменении инструмента — сразу тянем цену (автоматически)
+  document.getElementById('symbolInput').addEventListener('change', () => {
+    fetchAndSetPrice(true);
+  });
+
+  loadSymbols();
 </script>
 </body>
 </html>
