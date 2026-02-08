@@ -128,6 +128,14 @@
     @media (max-width:600px) {.half-btns{ grid-template-columns:1fr; } }
 
     .muted { font-size:11px; color:var(--tsoft); margin-top:4px; }
+    .live-pnl {
+      font-size: 11px;
+      margin-top: 3px;
+      min-height: 1.2em;
+    }
+    .live-pnl .v {
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
@@ -152,15 +160,28 @@
           </div>
           <div>
             <label for="leverage">Плечо (x)</label>
-            <input id="leverage" type="text" placeholder="Например, 20" value="20">
+            <!-- выпадающий список 5..50 с шагом 5 -->
+            <select id="leverage">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20" selected>20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+              <option value="35">35</option>
+              <option value="40">40</option>
+              <option value="45">45</option>
+              <option value="50">50</option>
+            </select>
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="symbolInput">Инструмент (USDT линейный перп)</label>
-            <input id="symbolInput" list="symbolsList" placeholder="Начни вводить: Z или ZORA…">
-            <datalist id="symbolsList"></datalist>
+            <label for="symbolSelect">Инструмент (USDT линейный перп)</label>
+            <select id="symbolSelect">
+              <option value="">Загружаю список с Bybit…</option>
+            </select>
             <div class="muted" id="symbolsInfo">
               Загружаю все страницы instruments-info V5 (category=linear, quoteCoin=USDT)…
             </div>
@@ -186,10 +207,12 @@
           <div>
             <label for="sl">Stop-Loss цена</label>
             <input id="sl" type="text" placeholder="Например, 2.10">
+            <div id="slLive" class="live-pnl"></div>
           </div>
           <div>
             <label for="tp">Take-Profit цена</label>
             <input id="tp" type="text" placeholder="Например, 2.80">
+            <div id="tpLive" class="live-pnl"></div>
           </div>
         </div>
 
@@ -265,21 +288,38 @@
     return v.toFixed(d);
   }
 
-  function renderSymbolsToDatalist() {
-    const dl = document.getElementById('symbolsList');
-    dl.innerHTML = '';
+  function renderSymbolsToSelect() {
+    const sel = document.getElementById('symbolSelect');
+    sel.innerHTML = '';
+
+    if (!allSymbols.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Нет USDT линейных контрактов';
+      sel.appendChild(opt);
+      return;
+    }
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Выбери инструмент';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    sel.appendChild(placeholder);
+
     for (const inst of allSymbols) {
       const symbol = inst.symbol;
       const tickSize = inst.priceFilter?.tickSize || '0.0001';
       const opt = document.createElement('option');
       opt.value = symbol;
-      opt.label = `${symbol}.P  (tickSize ${tickSize})`;
-      dl.appendChild(opt);
+      opt.textContent = `${symbol}.P  (tickSize ${tickSize})`;
+      sel.appendChild(opt);
     }
   }
 
   function getSelectedSymbol() {
-    const val = document.getElementById('symbolInput').value.trim();
+    const sel = document.getElementById('symbolSelect');
+    const val = sel.value.trim();
     if (!val) return '';
     const exists = allSymbols.some(inst => inst.symbol === val);
     return exists ? val : '';
@@ -290,7 +330,7 @@
     const warnEl = document.getElementById('warn');
 
     if (!symbol) {
-      if (!auto) warnEl.textContent = 'Сначала выбери корректный тикер из поля инструмента.';
+      if (!auto) warnEl.textContent = 'Сначала выбери тикер из списка инструментов.';
       return;
     }
 
@@ -309,12 +349,14 @@
 
       document.getElementById('entry').value = lastPrice.toString();
       warnEl.textContent = auto ? '' : 'Цена обновлена.';
+      updateLivePnL(); // пересчитать быстрые подсказки, если уже введены SL/TP
     } catch (e) {
       console.error(e);
       warnEl.textContent = 'Не удалось получить цену с Bybit: ' + e.message;
     }
   }
 
+  // ===== Основной расчёт по кнопке =====
   function calc() {
     const dir = document.getElementById('direction').value;
     const margin = parseNum(document.getElementById('margin').value);
@@ -328,7 +370,7 @@
     warnEl.textContent = '';
 
     if (!symbol) {
-      warnEl.textContent = 'Выбери корректный тикер из списка (datalist).';
+      warnEl.textContent = 'Выбери тикер из списка инструментов.';
       return;
     }
     if (!isFinite(margin) || margin <= 0) {
@@ -344,25 +386,23 @@
       return;
     }
 
-    // === Автоматический расчёт количества монет ===
+    // авторасчет количества монет
     let qty;
     if (isFinite(qtyManual) && qtyManual > 0) {
-      // если пользователь сам ввёл qty — используем его
       qty = qtyManual;
     } else {
-      // иначе считаем автоматически из маржи и плеча
-      const notionalUsdt = margin * lev; // сколько USDT в позиции
-      qty = notionalUsdt / entry;        // сколько монет по текущей цене
+      const notionalUsdt = margin * lev; // номинал позиции в USDT
+      qty = notionalUsdt / entry;        // количество монет
     }
     if (!isFinite(qty) || qty <= 0) {
       warnEl.textContent = 'Не удалось посчитать объём позиции.';
       return;
     }
 
-    // записываем авторассчитанное qty в левое поле
+    // записываем авторасчитанное qty в левое поле
     document.getElementById('qty').value = fmt(qty, 4);
 
-    // номинал в монетах (а не в USDT)
+    // номинал позиции в монетах (а не в USDT)
     const nominal = qty;
 
     let tpPnl = NaN, slPnl = NaN;
@@ -384,7 +424,7 @@
     if (symbolsMeta[symbol] && symbolsMeta[symbol].tickSize) {
       tickSize = parseFloat(symbolsMeta[symbol].tickSize);
     }
-    const tickValue = qty * tickSize; // в USDT
+    const tickValue = qty * tickSize; // стоимость тика в USDT
 
     document.getElementById('outQty').textContent = fmt(qty, 4);
     document.getElementById('outNominal').textContent = fmt(nominal, 4);
@@ -405,13 +445,75 @@
       isFinite(slPct) ? fmt(slPct, 2) + ' %' : '—';
   }
 
+  // ===== Быстрый PnL по TP/SL "на лету" =====
+  function updateLivePnL() {
+    const dir = document.getElementById('direction').value;
+    const margin = parseNum(document.getElementById('margin').value);
+    const lev = parseNum(document.getElementById('leverage').value);
+    const entry = parseNum(document.getElementById('entry').value);
+    const tp = parseNum(document.getElementById('tp').value);
+    const sl = parseNum(document.getElementById('sl').value);
+    const qtyManual = parseNum(document.getElementById('qty').value);
+    const symbol = getSelectedSymbol();
+
+    const tpEl = document.getElementById('tpLive');
+    const slEl = document.getElementById('slLive');
+
+    // по умолчанию чистим подсказки
+    tpEl.textContent = '';
+    slEl.textContent = '';
+
+    // нужны базовые данные
+    if (!symbol || !isFinite(margin) || margin <= 0 ||
+        !isFinite(lev) || lev <= 0 ||
+        !isFinite(entry) || entry <= 0) {
+      return;
+    }
+
+    // qty то же, что в основном расчёте
+    let qty;
+    if (isFinite(qtyManual) && qtyManual > 0) {
+      qty = qtyManual;
+    } else {
+      const notionalUsdt = margin * lev;
+      qty = notionalUsdt / entry;
+    }
+    if (!isFinite(qty) || qty <= 0) return;
+
+    // TP
+    if (isFinite(tp) && tp > 0) {
+      let tpPnl = (dir === 'long')
+        ? (tp - entry) * qty
+        : (entry - tp) * qty;
+      let tpPct = (tpPnl / margin) * 100;
+
+      const cls = tpPnl >= 0 ? 'good' : 'bad';
+      tpEl.innerHTML =
+        `<span class="${cls} v">${fmt(tpPnl, 2)} USDT</span> &nbsp; (${fmt(tpPct, 2)} %)`;
+    }
+
+    // SL
+    if (isFinite(sl) && sl > 0) {
+      let slPnl = (dir === 'long')
+        ? (sl - entry) * qty
+        : (entry - sl) * qty;
+      let slPct = (slPnl / margin) * 100;
+
+      const cls = slPnl >= 0 ? 'good' : 'bad';
+      slEl.innerHTML =
+        `<span class="${cls} v">${fmt(slPnl, 2)} USDT</span> &nbsp; (${fmt(slPct, 2)} %)`;
+    }
+  }
+
   function clearAll() {
-    ['margin','leverage','entry','sl','tp','qty','symbolInput'].forEach(id => {
-      const el = document.getElementById(id);
-      if (id === 'leverage') el.value = '20';
-      else el.value = '';
+    ['margin','entry','sl','tp','qty'].forEach(id => {
+      document.getElementById(id).value = '';
     });
+    document.getElementById('leverage').value = '20';
+    document.getElementById('symbolSelect').value = '';
     document.getElementById('warn').textContent = '';
+    document.getElementById('tpLive').textContent = '';
+    document.getElementById('slLive').textContent = '';
     ['outQty','outNominal','outTickValue','outTpPnl','outTpPct','outSlPnl','outSlPct']
       .forEach(id => document.getElementById(id).textContent = '—');
   }
@@ -457,9 +559,9 @@
       if (list.length === 0) {
         infoEl.textContent = 'Bybit вернул пустой список USDT линейных контрактов.';
       } else {
-        renderSymbolsToDatalist();
+        renderSymbolsToSelect();
         infoEl.textContent =
-          `Загружено ${list.length} USDT линейных бессрочных фьючерсов. Начни вводить тикер в поле выше.`;
+          `Загружено ${list.length} USDT линейных бессрочных фьючерсов. Выбери инструмент из списка.`;
       }
     } catch (e) {
       console.error(e);
@@ -471,14 +573,20 @@
   document.getElementById('btnClear').addEventListener('click', clearAll);
   document.getElementById('btnUpdate').addEventListener('click', () => fetchAndSetPrice(false));
 
-  ['margin','leverage','entry','sl','tp','qty','symbolInput'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => {
+  ['margin','entry','sl','tp','qty'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('keydown', e => {
       if (e.key === 'Enter') calc();
     });
+    // при изменении базовых полей — обновляем "живой" PnL
+    el.addEventListener('input', updateLivePnL);
   });
 
-  // При выборе/изменении инструмента — сразу тянем цену (автоматически)
-  document.getElementById('symbolInput').addEventListener('change', () => {
+  document.getElementById('direction').addEventListener('change', updateLivePnL);
+  document.getElementById('leverage').addEventListener('change', updateLivePnL);
+
+  // При смене инструмента — тянем цену и пересчитываем "живой" PnL
+  document.getElementById('symbolSelect').addEventListener('change', () => {
     fetchAndSetPrice(true);
   });
 
